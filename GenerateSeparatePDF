@@ -1,3 +1,7 @@
+////////////
+// no cal recarregar sino que es poden executar directament desde l'editor de scripts
+///////////
+
 PropertiesService.getScriptProperties().setProperty('primercop', 'true');
 //posar el número de full queda obert en el últim generat
 PropertiesService.getScriptProperties().setProperty('seguirFull', '6');
