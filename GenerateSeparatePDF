@@ -1,7 +1,11 @@
-PropertiesService.getScriptProperties().setProperty('primercop', 'false');
+PropertiesService.getScriptProperties().setProperty('primercop', 'true');
 //posar el número de full queda obert en el últim generat
 PropertiesService.getScriptProperties().setProperty('seguirFull', '6');
 
+// config @ onBlob
+// per ajustar al contingut: fitw=true
+// per a que surtin &gridlines=true
+ 
 /**
  * @license MIT
  *
@@ -61,14 +65,14 @@ function _getAsBlob(url, sheet, range) {
       + '/export?exportFormat=pdf&format=pdf'
       + '&size=LETTER'
       + '&portrait=true'
-      + '&fitw=true'      
+      + '&fitw=false'      
       + '&top_margin=0.75'              
       + '&bottom_margin=0.75'          
       + '&left_margin=0.7'            
       + '&right_margin=0.7'          
       + '&sheetnames=false&printtitle=false'
       + '&pagenum=false'
-      + '&gridlines=true'
+      + '&gridlines=false'
       + '&fzr=FALSE'      
       + sheetParam
       + rangeParam
