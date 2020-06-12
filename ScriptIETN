@@ -1,6 +1,99 @@
-////////////
-// no cal recarregar sino que es poden executar directament desde l'editor de scripts
-///////////
+/**
+ * @license MIT
+ * No cal recarregar, sinò que es poden executar directament des del Editor de Scripts
+ */
+function onOpen() {
+  SpreadsheetApp.getUi()
+    .createAddonMenu()
+    .addItem('Informes > Generar copies', 'cloneGoogleSheet')
+    .addItem('Informes > Imprimir per separat', 'exportAllSheetsAsSeparatePDFs')
+    .addItem('Enviar emails', 'sendEmails')
+    //.addItem('Export all sheets', 'exportAsPDF')
+    //.addItem('Export current sheet', 'exportCurrentSheetAsPDF')
+    //.addItem('Export selected area', 'exportPartAsPDF')
+    //.addItem('Export predefined area', 'exportNamedRangesAsPDF')
+    .addToUi()
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Fa copies a partir d'una taula de noms
+
+function cloneGoogleSheet()
+{
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet_alumnes = ss.getSheetByName('Alumnes');
+ 
+  for(i = 1; i <= sheet_alumnes.getLastRow(); i++)
+  {
+    var separate_name = [{}];
+    var complete_name = String(sheet_alumnes.getRange(i, 1).getValue());
+    separate_name = complete_name.split(" ");
+    var name = separate_name[0];
+    var new_name = name;
+    if(separate_name.length == 2)
+    {
+      new_name = new_name + " " + String(separate_name[1]).toUpperCase();
+    }
+    else if(separate_name.length == 3)
+    {
+      new_name = new_name + " " +separate_name[1].toUpperCase() + " " +separate_name[2].toUpperCase();
+    }
+    else if(separate_name.length == 4)
+    {
+      name = name + " " + separate_name[1];
+      new_name = name;
+      new_name = new_name + " " +separate_name[2].toUpperCase() + " " +separate_name[3].toUpperCase();
+    }
+   
+    var sheet = ss.getSheetByName('Plantilla').copyTo(ss);
+    sheet.setName(name);
+    sheet.getRange('A1').setValue(new_name);
+  }
+}
+
+/*
+function deleteRedundantSheets()
+{
+   var ss = SpreadsheetApp.getActiveSpreadsheet();
+   var sheet = ss.getSheets()[0];
+   var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+
+   for (i = 0; i < sheets.length; i++)
+   {
+     if(sheets[i].getSheetName() != "Plantilla" && sheets[i].getSheetName() != "Alumnes")
+     {
+       ss.deleteSheet(ss.getSheetByName(sheets[i].getSheetName()));
+     }
+   }
+}
+*/
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Envia emails a partir d'una taula
+//Primera fila és capçalera
+//Primera columna és el email
+//Segona columna és el missatge que vols enviar
+//Revisar el "subject" al codi
+
+function sendEmails() {
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var startRow = 2; // First row of data to process
+  var numRows = 2; // Number of rows to process
+  // Fetch the range of cells A2:B3
+  var dataRange = sheet.getRange(startRow, 1, numRows, 2);
+  // Fetch values for each row in the Range.
+  var data = dataRange.getValues();
+  for (var i in data) {
+    var row = data[i];
+    var emailAddress = row[0]; // First column
+    var message = row[1]; // Second column
+    var subject = 'Codi per tindre Filmin GRATIS';
+    MailApp.sendEmail(emailAddress, subject, message);
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Imprimir informes en PDF per separat
 
 PropertiesService.getScriptProperties().setProperty('primercop', 'true');
 //posar el número de full queda obert en el últim generat
@@ -9,33 +102,7 @@ PropertiesService.getScriptProperties().setProperty('seguirFull', '6');
 // config @ onBlob
 // per ajustar al contingut: fitw=true
 // per a que surtin &gridlines=true
- 
-/**
- * @license MIT
- *
- * © 2020 xfanatical.com. All Rights Reserved.
- *
- * @since 1.3.1 Fix a landscape problem
- * @since 1.3.0 Support printing the entire spreadsheet as separate pdf files
- * @since 1.2.3 Add formatting for a single predefined area
- * @since 1.2.2 Add formatting for a single selected area
- * @since 1.2.1 Fix a reference issue of printing current sheet
- * @since 1.2.0 Support printing current sheet as pdf
- * @since 1.1.1 Fix an error for multi-language
- * @since 1.1.0 Support printing predefined areas as a pdf
- * @since 1.0.0 Support printing the entire spreadsheet as a pdf
- *              Support printing the selected areas as a pdf
- */
-function onOpen() {
-  SpreadsheetApp.getUi()
-    .createAddonMenu()
-    .addItem('Export all sheets', 'exportAsPDF')
-    .addItem('Export all sheets as separate files', 'exportAllSheetsAsSeparatePDFs')
-    .addItem('Export current sheet', 'exportCurrentSheetAsPDF')
-    .addItem('Export selected area', 'exportPartAsPDF')
-    .addItem('Export predefined area', 'exportNamedRangesAsPDF')
-    .addToUi()
-}
+
 function _exportBlob(blob, fileName) {
   blob = blob.setName(fileName)
   var pdfFile = DriveApp.createFile(blob)
