@@ -2,6 +2,7 @@
 //Primera columna és el email
 //Segona columna és el missatge que vols enviar
 //Revisar el "subject" al codi
+//Posar un email de prova al final per comprovar que s'han enviat tots els emails anteriors
 
 function sendEmails() {
   var sheet = SpreadsheetApp.getActiveSheet();
