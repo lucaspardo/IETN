@@ -1,3 +1,5 @@
+// Fa copies a partir d'una taula de noms
+
 function cloneGoogleSheet()
 {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
