@@ -312,6 +312,19 @@ function list_all_files(folder){
    sh.getRange(1,1,list.length,list[0].length).setValues(list);
 }
 
+//Cal posar el folder en el root del GDrive
+function list_all_files_from_folder(){
+  //get name of folder from GSheets
+  var name = SpreadsheetApp.getActiveSheet().getRange('A1').getValue();
+    
+  //mirar si la carpeta ja existeix
+  var parent = DriveApp.getRootFolder();
+  var folders = parent.getFoldersByName(name);
+  while (folders.hasNext()) var folder = folders.next();
+  
+  list_all_files(folder);
+}
+
 function exportCurrentSheetAsPDF() {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
   var currentSheet = SpreadsheetApp.getActiveSheet()
