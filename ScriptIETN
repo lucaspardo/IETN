@@ -299,7 +299,7 @@ function list_all_files(folder){
     row.push(file.getName(),file.getId(),file.getSize())
     list.push(row);
   }
-   sh.getRange(1,1,list.length,list[0].length).setValues(list);
+   sh.getRange(1,2,list.length,list[0].length).setValues(list);
 }
 
 function exportCurrentSheetAsPDF() {
