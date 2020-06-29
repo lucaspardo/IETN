@@ -5,10 +5,10 @@
 function onOpen() {
   SpreadsheetApp.getUi()
     .createAddonMenu()
-    .addItem('Informes > Generar copies', 'cloneGoogleSheet')
-    .addItem('Informes > Imprimir per separat', 'exportAllSheetsAsSeparatePDFs')
-    .addItem('Google Slides > Generar', 'generateReport')
-    .addItem('Enviar emails', 'sendEmails')
+    .addItem('Google Sheets > Informes > Generar copies', 'cloneGoogleSheet')
+    .addItem('Google Sheets > Informes > Imprimir per separat', 'exportAllSheetsAsSeparatePDFs')
+    .addItem('Google Sheets > Enviar emails', 'sendEmails')
+    .addItem('Google Slides > Generar copies', 'generateReport')
     //.addItem('Export all sheets', 'exportAsPDF')
     //.addItem('Export current sheet', 'exportCurrentSheetAsPDF')
     //.addItem('Export selected area', 'exportPartAsPDF')
@@ -126,26 +126,44 @@ templateSlide.remove();
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Envia emails a partir d'una taula
+//Envia emails a partir d'una taula: https://docs.google.com/spreadsheets/d/18zosx2rD7G4jA6cmTyS3A3iCZPPdCM4bfuxS8hNwsio/edit#gid=0
 //Primera fila és capçalera
 //Primera columna és el email
 //Segona columna és el missatge que vols enviar
-//Revisar el "subject" al codi
+//Revisar el "subject" al codi + fer prova amb profes abans!
 
 function sendEmails() {
   var sheet = SpreadsheetApp.getActiveSheet();
   var startRow = 2; // First row of data to process
   var numRows = 2; // Number of rows to process
   // Fetch the range of cells A2:B3
-  var dataRange = sheet.getRange(startRow, 1, numRows, 2);
+  var dataRange = sheet.getRange(startRow, 1, numRows, 5);
   // Fetch values for each row in the Range.
   var data = dataRange.getValues();
+  
   for (var i in data) {
     var row = data[i];
     var emailAddress = row[0]; // First column
-    var message = row[1]; // Second column
-    var subject = 'Codi per tindre Filmin GRATIS';
-    MailApp.sendEmail(emailAddress, subject, message);
+    var subject = row[1]; // Second column
+    var message = row[2]; // Third column
+    // Attachments
+    if(row[3]!=''){
+      var file = DriveApp.getFileById(row[3]);// Fourth column
+      if(row[4]!=''){
+        var file2 = DriveApp.getFileById(row[4]);// Fifth column
+        MailApp.sendEmail(emailAddress, subject, message, {
+          name: 'Automatic Emailer Script',
+          attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
+        });
+      }else{
+        MailApp.sendEmail(emailAddress, subject, message, {
+          name: 'Automatic Emailer Script',
+          attachments: [file.getAs(MimeType.PDF)]
+        });
+      }
+    }else{
+      MailApp.sendEmail(emailAddress, subject, message);
+    }
   }
 }
 
