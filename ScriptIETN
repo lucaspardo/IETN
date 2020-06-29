@@ -232,48 +232,25 @@ function _getAsBlob(url, sheet, range) {
  
   return response.getBlob()
 }
+
 function exportAllSheetsAsSeparatePDFs() {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
   var files = []
- 
- 
-  /*spreadsheet.getSheets().forEach(function (sheet) {
-    spreadsheet.setActiveSheet(sheet)
-   
-    var blob = _getAsBlob(spreadsheet.getUrl(), sheet)
-    var fileName = sheet.getName()
-    blob = blob.setName(fileName)
-    var pdfFile = DriveApp.createFile(blob)
-   
-    files.push({
-      url: pdfFile.getUrl(),
-      name: fileName,
-    })
-   
-    Utilities.sleep(2000);
-  })*/
  
   var numbofsheet=spreadsheet.getNumSheets();// check how many sheets in the spreadsheet
  
   //mirar si la carpeta ja existeix
   var parent = DriveApp.getRootFolder();
   var folders = parent.getFoldersByName("PDFsGenerats");
-  while (folders.hasNext()) {
-    var folder = folders.next();
-  }
+  while (folders.hasNext()) var folder = folders.next();
  
   //si carpeta no existeix, crear-la
-  if(folder==null){
-
-    var folder = DriveApp.createFolder("PDFsGenerats");
-  }
+  if(folder==null)  var folder = DriveApp.createFolder("PDFsGenerats");
  
   //mirar si és el primer cop
-  if(PropertiesService.getScriptProperties().getProperty('primercop') == 'false'){
-    numbofsheet=PropertiesService.getScriptProperties().getProperty('seguirFull');
-  }
+  if(PropertiesService.getScriptProperties().getProperty('primercop') == 'false')    numbofsheet=PropertiesService.getScriptProperties().getProperty('seguirFull');
 
-  for (pa=numbofsheet-1;pa>0;--pa){
+  for (pa=numbofsheet-1; pa>0; --pa){
     spreadsheet.setActiveSheet(spreadsheet.getSheets()[pa]);
     var blob = _getAsBlob(spreadsheet.getUrl(), spreadsheet.getSheets()[pa])
     var fileName = spreadsheet.getSheets()[pa].getName() + ".pdf"
@@ -287,8 +264,6 @@ function exportAllSheetsAsSeparatePDFs() {
     var pull = DriveApp.getRootFolder();
     pull.removeFile(pdfFile);
 
-
-   
     files.push({
       url: pdfFile.getUrl(),
       name: fileName,
@@ -296,8 +271,10 @@ function exportAllSheetsAsSeparatePDFs() {
    
     Utilities.sleep(2000);// pause in the loop for 200 milliseconds
   }
-                                 
- 
+  
+  //Generate file with list of IDs of files generated
+  list_all_files(folder);
+                  
   const htmlOutput = HtmlService
     .createHtmlOutput('<p>Click to open PDF files</p>'
       + '<ul>'
@@ -310,6 +287,21 @@ function exportAllSheetsAsSeparatePDFs() {
     .setHeight(150)
   SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Export Successful')
 }
+
+function list_all_files(folder){
+  var sh = SpreadsheetApp.getActiveSheet();
+  var list = [];
+  list.push(['Name','ID','Size']);
+  var files = folder.getFiles();
+  while (files.hasNext()){
+    file = files.next();
+    var row = []
+    row.push(file.getName(),file.getId(),file.getSize())
+    list.push(row);
+  }
+   sh.getRange(1,1,list.length,list[0].length).setValues(list);
+}
+
 function exportCurrentSheetAsPDF() {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
   var currentSheet = SpreadsheetApp.getActiveSheet()
@@ -317,6 +309,7 @@ function exportCurrentSheetAsPDF() {
   var blob = _getAsBlob(spreadsheet.getUrl(), currentSheet)
   _exportBlob(blob, currentSheet.getName())
 }
+
 function exportPartAsPDF(predefinedRanges) {
   var ui = SpreadsheetApp.getUi()
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
