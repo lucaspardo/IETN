@@ -129,13 +129,15 @@ templateSlide.remove();
 //Envia emails a partir d'una taula: https://docs.google.com/spreadsheets/d/18zosx2rD7G4jA6cmTyS3A3iCZPPdCM4bfuxS8hNwsio/edit#gid=0
 //Primera fila és capçalera
 //Primera columna és el email
-//Segona columna és el missatge que vols enviar
-//Revisar el "subject" al codi + fer prova amb profes abans!
+//Segona columna és l'assumpte
+//Tercera columna és el missatge que vols enviar
+//Quarta i cinquena columna són els PDFs adjunts
+//Fer prova amb profes abans!
 
 function sendEmails() {
   var sheet = SpreadsheetApp.getActiveSheet();
   var startRow = 2; // First row of data to process
-  var numRows = 2; // Number of rows to process
+  var numRows = 1; // Number of rows to process
   // Fetch the range of cells A2:B3
   var dataRange = sheet.getRange(startRow, 1, numRows, 5);
   // Fetch values for each row in the Range.
@@ -151,13 +153,21 @@ function sendEmails() {
       var file = DriveApp.getFileById(row[3]);// Fourth column
       if(row[4]!=''){
         var file2 = DriveApp.getFileById(row[4]);// Fifth column
-        MailApp.sendEmail(emailAddress, subject, message, {
-          name: 'Automatic Emailer Script',
-          attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
-        });
+        if(row[5]!=''){
+          var file3 = DriveApp.getFileById(row[5]);// Sixth column
+          MailApp.sendEmail(emailAddress, subject, message, {
+            name: 'IETN',
+            attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF), file3.getAs(MimeType.PDF)]
+          });
+        }else{
+          MailApp.sendEmail(emailAddress, subject, message, {
+            name: 'IETN',
+            attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
+          });
+        }
       }else{
         MailApp.sendEmail(emailAddress, subject, message, {
-          name: 'Automatic Emailer Script',
+          name: 'IETN',
           attachments: [file.getAs(MimeType.PDF)]
         });
       }
@@ -299,7 +309,7 @@ function list_all_files(folder){
     row.push(file.getName(),file.getId(),file.getSize())
     list.push(row);
   }
-   sh.getRange(1,2,list.length,list[0].length).setValues(list);
+   sh.getRange(1,1,list.length,list[0].length).setValues(list);
 }
 
 function exportCurrentSheetAsPDF() {
