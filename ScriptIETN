@@ -8,6 +8,7 @@ function onOpen() {
     .addItem('Google Sheets > Informes > Generar copies', 'cloneGoogleSheet')
     .addItem('Google Sheets > Informes > Imprimir per separat', 'exportAllSheetsAsSeparatePDFs')
     .addItem('Google Sheets > Enviar emails', 'sendEmails')
+    .addItem('Google Sheets > Obtindre IDs de carpeta', 'listFiles')
     .addItem('Google Slides > Generar copies', 'generateReport')
     //.addItem('Export all sheets', 'exportAsPDF')
     //.addItem('Export current sheet', 'exportCurrentSheetAsPDF')
@@ -137,9 +138,9 @@ templateSlide.remove();
 function sendEmails() {
   var sheet = SpreadsheetApp.getActiveSheet();
   var startRow = 2; // First row of data to process
-  var numRows = 1; // Number of rows to process
+  var numRows = 30; // Number of rows to process
   // Fetch the range of cells A2:B3
-  var dataRange = sheet.getRange(startRow, 1, numRows, 5);
+  var dataRange = sheet.getRange(startRow, 1, numRows, 6);
   // Fetch values for each row in the Range.
   var data = dataRange.getValues();
   
@@ -156,23 +157,20 @@ function sendEmails() {
         if(row[5]!=''){
           var file3 = DriveApp.getFileById(row[5]);// Sixth column
           MailApp.sendEmail(emailAddress, subject, message, {
-            name: 'IETN',
-            attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF), file3.getAs(MimeType.PDF)]
+            attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF), file3.getAs(MimeType.PDF)], htmlBody: message
           });
         }else{
           MailApp.sendEmail(emailAddress, subject, message, {
-            name: 'IETN',
-            attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)]
+            attachments: [file.getAs(MimeType.PDF), file2.getAs(MimeType.PDF)], htmlBody: message
           });
         }
       }else{
         MailApp.sendEmail(emailAddress, subject, message, {
-          name: 'IETN',
-          attachments: [file.getAs(MimeType.PDF)]
+          attachments: [file.getAs(MimeType.PDF)], htmlBody: message
         });
       }
     }else{
-      MailApp.sendEmail(emailAddress, subject, message);
+      MailApp.sendEmail(emailAddress, subject, message, {htmlBody: message});
     }
   }
 }
@@ -282,7 +280,7 @@ function exportAllSheetsAsSeparatePDFs() {
     Utilities.sleep(2000);// pause in the loop for 200 milliseconds
   }
   
-  //Generate file with list of IDs of files generated
+  //Generate list of IDs of files generated
   list_all_files(folder);
                   
   const htmlOutput = HtmlService
@@ -313,7 +311,7 @@ function list_all_files(folder){
 }
 
 //Cal posar el folder en el root del GDrive
-function list_all_files_from_folder(){
+function listFiles(){
   //get name of folder from GSheets
   var name = SpreadsheetApp.getActiveSheet().getRange('A1').getValue();
     
